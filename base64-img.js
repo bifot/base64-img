@@ -9,7 +9,7 @@ function base64(filename, data) {
   if (extname === 'svg') {
     extname = "svg+xml"
   }
-  
+
   return 'data:image/' + extname + ';base64,' + data.toString('base64');
 }
 
@@ -67,23 +67,28 @@ exports.base64Sync = function(filename) {
  * Get base64 from url
  * @example
  * request.base64(
- *   'http://webresource.c-ctrip.com/ResCRMOnline/R5/html5/images/57.png', 
+ *   'http://webresource.c-ctrip.com/ResCRMOnline/R5/html5/images/57.png',
  *   function(err, res, body) {
- * 
+ *
  *   }
  * );
  */
-exports.requestBase64 = function(url, callback) {
-  request({
-    url: url,
-    isBuffer: true
-  }, function (err, res, body) {
-    if (err) return callback(err);
+exports.requestBase64 = (url) => {
+  return new Promise((resolve, reject) => {
+    request({
+      url,
+      isBuffer: true
+    }, (err, res, body) => {
+      if (err) {
+        reject(err)
+      } else {
+        var data = 'data:' + res.headers['content-type'] + ';base64,' + body.toString('base64');
 
-    var data = 'data:' + res.headers['content-type'] + ';base64,' + body.toString('base64');
-    callback(err, res, data);
-  });
-};
+        resolve(data)
+      }
+    })
+  })
+}
 
 /**
  * @description
